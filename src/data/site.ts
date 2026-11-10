@@ -56,7 +56,7 @@ export const site = {
   ],
 
 
-  source: 'https://github.com/your-username/portfolio',
+  source: 'https://github.com/joshuanegre20/joshuanegre20.github.io',
 };
 
 export const nav = [
