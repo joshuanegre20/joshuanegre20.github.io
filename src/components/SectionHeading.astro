@@ -1,0 +1,22 @@
+---
+interface Props {
+  index: string;
+  title: string;
+  id?: string;
+  href?: string;
+  linkLabel?: string;
+}
+const { index, title, id, href, linkLabel = 'View all' } = Astro.props;
+---
+
+<div data-reveal class="mb-10 grid grid-cols-12 items-baseline gap-x-4 border-t border-ink pt-4 md:mb-14">
+  <span class="label col-span-2 md:col-span-1">{index}</span>
+  <h2 id={id} class="col-span-10 scroll-mt-24 font-serif text-title md:col-span-8">{title}</h2>
+  {
+    href && (
+      <a href={href} class="link col-span-12 mt-3 justify-self-start text-[0.95rem] md:col-span-3 md:mt-0 md:justify-self-end">
+        {linkLabel} →
+      </a>
+    )
+  }
+</div>

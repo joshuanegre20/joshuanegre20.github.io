@@ -1,0 +1,59 @@
+---
+import { getCollection } from 'astro:content';
+import SectionHeading from './SectionHeading.astro';
+import { site } from '../data/site';
+
+interface Props {
+  index: string;
+}
+const { index } = Astro.props;
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+// Which projects on this site used each tool.
+const usedIn = (tool: string) =>
+  projects.filter((p) => p.data.tech.some((t) => t.toLowerCase() === tool.toLowerCase())).map((p) => p.data.title);
+---
+
+<section class="py-20 md:py-28" aria-labelledby="stack">
+  <SectionHeading {index} title="Tech stack" id="stack" />
+
+  <div class="grid grid-cols-12 gap-x-4">
+    <p data-reveal class="col-span-12 mb-10 max-w-xl text-lg text-ink/80 md:col-span-6 md:col-start-2">
+      What I reach for, and where it shipped. The number next to a tool is how many projects on this site use it.
+    </p>
+
+    <dl class="col-span-12 md:col-span-11 md:col-start-2">
+      {
+        site.stack.map(({ group, items }) => (
+          <div data-reveal class="grid grid-cols-12 gap-x-4 gap-y-3 border-t border-rule py-5 last:border-b">
+            <dt class="label col-span-12 md:col-span-3 md:pt-1.5">{group}</dt>
+            <dd class="col-span-12 md:col-span-9">
+              <ul class="flex flex-wrap gap-2">
+                {items.map((tool) => {
+                  const used = usedIn(tool);
+                  return (
+                    <li
+                      class="inline-flex items-baseline gap-1.5 rounded-full border border-rule px-3 py-1 text-[0.95rem] transition duration-200 hover:-translate-y-0.5 hover:border-ink"
+                      title={used.length ? `Used in ${used.join(', ')}` : undefined}
+                    >
+                      {tool}
+                      {used.length > 0 && (
+                        <>
+                          <span aria-hidden="true" class="font-mono text-[0.75rem] text-accent">
+                            {used.length}
+                          </span>
+                          <span class="sr-only">, used in {used.join(', ')}</span>
+                        </>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>

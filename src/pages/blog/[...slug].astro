@@ -1,0 +1,62 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { title, description, pubDate, updatedDate, tags } = post.data;
+const words = (post.body ?? '').split(/\s+/).filter(Boolean).length;
+const minutes = Math.max(1, Math.round(words / 230));
+---
+
+<BaseLayout title={title} description={description} type="article">
+  <div id="read-progress" aria-hidden="true" class="fixed inset-x-0 top-0 z-50 h-[2px] origin-left scale-x-0 bg-accent"></div>
+
+  <article class="grid grid-cols-12 gap-x-4 pb-10 pt-10 sm:pt-14">
+    <header class="col-span-12 md:col-span-9 md:col-start-3">
+      <a href="/blog" class="label link">← All writing</a>
+      <h1 class="mt-10 font-serif text-title md:text-[4rem]">{title}</h1>
+      <p class="mt-5 text-xl text-ink/75">{description}</p>
+      <p class="label mt-8 flex flex-wrap gap-x-5 gap-y-1 border-t border-rule pt-4">
+        <FormattedDate date={pubDate} />
+        {
+          updatedDate && (
+            <span>
+              Updated <FormattedDate date={updatedDate} />
+            </span>
+          )
+        }
+        <span>{minutes} min read</span>
+        {tags.length > 0 && <span>{tags.join(' · ')}</span>}
+      </p>
+    </header>
+
+    <div class="prose prose-lg col-span-12 mt-12 max-w-none md:col-span-7 md:col-start-3">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  const bar = document.getElementById('read-progress')!;
+  let ticking = false;
+  const update = () => {
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    bar.style.transform = `scaleX(${max > 0 ? Math.min(doc.scrollTop / max, 1) : 0})`;
+    ticking = false;
+  };
+  const onScroll = () => {
+    if (!ticking) requestAnimationFrame(update);
+    ticking = true;
+  };
+  update();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+</script>

@@ -1,0 +1,169 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { nav, site } from '../data/site';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
+---
+
+<header
+  id="site-header"
+  class="sticky top-0 z-40 border-b border-transparent transition-[background-color,border-color] duration-300 data-[scrolled]:border-rule data-[scrolled]:bg-paper/85 data-[scrolled]:backdrop-blur-md"
+>
+  <nav class="mx-auto flex h-16 max-w-page items-center justify-between gap-4 px-5 sm:px-8" aria-label="Main">
+    <a href="/" class="flex items-baseline gap-3">
+      <span class="font-medium tracking-tight">{site.name}</span>
+      <span class="label hidden lg:inline">{site.role}</span>
+    </a>
+
+    <div class="flex items-center gap-2">
+      <ul class="mr-2 hidden items-center gap-7 text-[0.95rem] md:flex">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                class:list={['link', isActive(item.href) && 'text-accent']}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        {
+          site.resume && (
+            <li>
+              <a href={site.resume} class="rounded-full border border-ink px-3.5 py-1 transition-colors hover:bg-ink hover:text-paper">
+                Résumé
+              </a>
+            </li>
+          )
+        }
+      </ul>
+      <ThemeToggle />
+      <button
+        id="menu-toggle"
+        type="button"
+        class="label rounded-full border border-rule px-3 py-1.5 text-ink md:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <span class="menu-label">Menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-menu" inert class="menu-panel bg-paper md:hidden">
+    <div>
+    <ul class="mx-auto max-w-page border-t border-rule px-5 py-4 sm:px-8">
+      {
+        nav.map((item, i) => (
+          <li class="border-b border-rule last:border-0" style={`--i:${i}`}>
+            <a href={item.href} class="flex items-baseline gap-4 py-3 font-serif text-3xl">
+              <span class="label w-6">0{i + 1}</span>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+      {
+        site.resume && (
+          <li style={`--i:${nav.length}`}>
+            <a href={site.resume} class="flex items-baseline gap-4 py-3 font-serif text-3xl">
+              <span class="label w-6">↗</span>
+              Résumé
+            </a>
+          </li>
+        )
+      }
+    </ul>
+    </div>
+  </div>
+
+  <div aria-hidden="true" class="absolute inset-x-0 bottom-[-1px] h-[2px]">
+    <div id="scroll-progress" class="h-full origin-left scale-x-0 bg-accent"></div>
+  </div>
+</header>
+
+<button
+  id="to-top"
+  type="button"
+  aria-label="Back to top"
+  class="fixed bottom-5 right-5 z-40 grid h-11 w-11 translate-y-4 place-items-center rounded-full bg-ink text-paper opacity-0 shadow-lg transition duration-300 pointer-events-none hover:bg-accent data-[show]:pointer-events-auto data-[show]:translate-y-0 data-[show]:opacity-100 sm:bottom-8 sm:right-8"
+>
+  <span aria-hidden="true">↑</span>
+</button>
+
+<script>
+  const header = document.getElementById('site-header')!;
+  const toggle = document.getElementById('menu-toggle')!;
+  const menu = document.getElementById('mobile-menu')!;
+  const label = toggle.querySelector('.menu-label')!;
+
+  const progress = document.getElementById('scroll-progress')!;
+  const toTop = document.getElementById('to-top')!;
+
+  const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+  let raf = 0;
+  const sync = () => {
+    raf = 0;
+    const y = window.scrollY;
+    header.toggleAttribute('data-scrolled', isOpen() || y > 4);
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.transform = `scaleX(${max > 0 ? Math.min(y / max, 1) : 0})`;
+    toTop.toggleAttribute('data-show', y > window.innerHeight * 0.8);
+  };
+  sync();
+  window.addEventListener('scroll', () => (raf ||= requestAnimationFrame(sync)), { passive: true });
+  window.addEventListener('resize', sync, { passive: true });
+
+  toTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0 });
+    document.getElementById('main')?.focus({ preventScroll: true });
+  });
+
+  // Highlight the nav link for the section currently on screen (home page only).
+  const links = new Map<string, HTMLAnchorElement>();
+  header.querySelectorAll<HTMLAnchorElement>('ul a[href^="/#"]').forEach((a) => {
+    if (location.pathname === '/') links.set(a.getAttribute('href')!.slice(2), a);
+  });
+  if (links.size && 'IntersectionObserver' in window) {
+    const spy = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const id = e.target.getAttribute('aria-labelledby')!;
+          const link = links.get(id);
+          if (!link) continue;
+          link.classList.toggle('text-accent', e.isIntersecting);
+          if (e.isIntersecting) link.setAttribute('aria-current', 'true');
+          else link.removeAttribute('aria-current');
+        }
+      },
+      { rootMargin: '-45% 0px -50% 0px' },
+    );
+    links.forEach((_, id) => {
+      const section = document.querySelector(`section[aria-labelledby="${id}"]`);
+      if (section) spy.observe(section);
+    });
+  }
+
+  const setOpen = (open: boolean) => {
+    menu.toggleAttribute('data-open', open);
+    menu.inert = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    label.textContent = open ? 'Close' : 'Menu';
+    sync();
+  };
+  toggle.addEventListener('click', () => setOpen(!isOpen()));
+  menu.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) setOpen(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen()) {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+  matchMedia('(min-width: 768px)').addEventListener('change', (e) => e.matches && setOpen(false));
+</script>

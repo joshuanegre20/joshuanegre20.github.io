@@ -1,0 +1,92 @@
+---
+import type { CollectionEntry } from 'astro:content';
+interface Props {
+  projects: CollectionEntry<'projects'>[];
+}
+const { projects } = Astro.props;
+---
+
+<ol class="group/list border-t border-rule" data-project-index>
+  {
+    projects.map(({ id, data }) => (
+      <li data-reveal class="border-b border-rule">
+        <a
+          href={`/projects/${id}`}
+          data-preview={data.image}
+          class="group grid grid-cols-12 items-baseline gap-x-4 gap-y-2 py-6 transition-opacity duration-300 md:py-8 md:group-hover/list:opacity-35 md:hover:!opacity-100"
+        >
+          <span class="label col-span-12 md:col-span-1">{data.year}</span>
+          <span class="col-span-12 font-serif text-[2.1rem] leading-none tracking-tight transition-colors group-hover:text-accent md:col-span-4 md:text-[2.75rem]">
+            {data.title}
+            <span aria-hidden="true" class="inline-block translate-x-[-0.3em] text-[0.6em] opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+              →
+            </span>
+          </span>
+          <span class="col-span-12 max-w-md text-ink/75 md:col-span-4">{data.outcome ?? data.description}</span>
+          <span class="label col-span-12 md:col-span-3 md:text-right">{data.role}</span>
+          {data.image && (
+            <img
+              src={data.image}
+              alt=""
+              loading="lazy"
+              width="800"
+              height="500"
+              class="col-span-12 mt-3 aspect-[16/10] w-full rounded-[3px] object-cover md:hidden"
+            />
+          )}
+        </a>
+      </li>
+    ))
+  }
+</ol>
+
+<div
+  id="project-preview"
+  aria-hidden="true"
+  class="pointer-events-none fixed left-0 top-0 z-30 hidden w-[22rem] opacity-0 transition-opacity duration-200 md:block"
+>
+  <img alt="" class="aspect-[16/10] w-full rounded-[3px] object-cover shadow-[0_20px_50px_-20px_rgb(0_0_0/0.45)]" />
+</div>
+
+<script>
+  const preview = document.getElementById('project-preview');
+  const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (preview && finePointer) {
+    const img = preview.querySelector('img')!;
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let x = 0, y = 0, cx = 0, cy = 0, raf = 0, active = false;
+
+    const loop = () => {
+      cx += (x - cx) * (still ? 1 : 0.16);
+      cy += (y - cy) * (still ? 1 : 0.16);
+      const tilt = still ? 0 : Math.max(-6, Math.min(6, (x - cx) * 0.05));
+      preview.style.transform = `translate3d(${cx + 28}px, ${cy - 110}px, 0) rotate(${tilt}deg)`;
+      raf = active || Math.abs(x - cx) > 0.5 ? requestAnimationFrame(loop) : 0;
+    };
+
+    document.querySelectorAll<HTMLAnchorElement>('[data-project-index] a[data-preview]').forEach((link) => {
+      link.addEventListener('mouseenter', (e) => {
+        img.src = link.dataset.preview!;
+        if (!active) {
+          cx = x = e.clientX;
+          cy = y = e.clientY;
+        }
+        active = true;
+        preview.style.opacity = '1';
+        if (!raf) raf = requestAnimationFrame(loop);
+      });
+      link.addEventListener('mouseleave', () => {
+        active = false;
+        preview.style.opacity = '0';
+      });
+    });
+    window.addEventListener(
+      'mousemove',
+      (e) => {
+        x = e.clientX;
+        y = e.clientY;
+      },
+      { passive: true },
+    );
+  }
+</script>

@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectIndex from '../../components/ProjectIndex.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
+---
+
+<BaseLayout title="Work" description="Products, tools, and experiments — with notes on what I did and how it went.">
+  <section class="pb-10 pt-14 sm:pt-20">
+    <p class="label">Index · {projects.length} projects</p>
+    <h1 class="mt-4 font-serif text-display">
+      <span class="rise"><span>Work</span></span>
+    </h1>
+    <p data-reveal class="mt-8 max-w-xl text-lg text-ink/80">
+      Products, tools, and experiments. Each one has a short write-up on the problem, what I did, and how it went.
+    </p>
+  </section>
+  <section class="pb-10">
+    <ProjectIndex projects={projects} />
+  </section>
+</BaseLayout>

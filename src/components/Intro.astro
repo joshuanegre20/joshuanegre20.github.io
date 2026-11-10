@@ -1,0 +1,141 @@
+---
+import { site } from '../data/site';
+
+const parts = (line: string) =>
+  line.split(/(\*[^*]+\*)/).map((p) => (p.startsWith('*') ? { em: true, text: p.slice(1, -1) } : { em: false, text: p }));
+
+const ring = `${site.status} · ${site.role} · `;
+---
+
+<section class="pb-20 pt-8 sm:pt-14 md:pb-28 lg:pt-16" aria-labelledby="intro-heading">
+  <div class="grid grid-cols-12 items-end gap-x-4 gap-y-10">
+    <!-- Portrait: first on every screen size so it is the first thing people see -->
+    <figure
+      class="hero-photo col-span-12 mx-auto w-[min(17rem,72vw)] sm:w-72 lg:order-2 lg:col-span-4 lg:mx-0 lg:w-full lg:max-w-[24rem] lg:justify-self-end"
+    >
+      <div class="relative">
+        <div
+          aria-hidden="true"
+          class="hero-glow absolute inset-x-[8%] -bottom-6 top-[35%] rounded-full bg-accent/30 blur-3xl"
+        ></div>
+        <div class="hero-arch relative aspect-[4/5] overflow-hidden rounded-b-[2rem] rounded-t-full bg-[#2a2d33] ring-1 ring-ink/10">
+          <img
+            src="/profile-studio.webp"
+            alt={`Portrait of ${site.name}`}
+            width="800"
+            height="1281"
+            fetchpriority="high"
+            decoding="async"
+            data-parallax
+            class="hero-img absolute inset-x-0 top-[-4%] h-[108%] w-full object-cover object-[50%_0%]"
+          />
+        </div>
+
+        <!-- Rotating badge -->
+        <div
+          aria-hidden="true"
+          class="hero-badge absolute -bottom-5 -left-5 grid h-24 w-24 place-items-center rounded-full bg-paper text-ink shadow-[0_10px_30px_-12px_rgb(0_0_0/0.35)] sm:h-28 sm:w-28 lg:-left-10"
+        >
+          <svg viewBox="0 0 100 100" class="spin absolute inset-1.5 h-[calc(100%-0.75rem)] w-[calc(100%-0.75rem)]">
+            <defs>
+              <path id="ring-path" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" />
+            </defs>
+            <text class="fill-current font-mono text-[8.4px] uppercase tracking-[0.14em]">
+              <textPath href="#ring-path" textLength="236">{ring}</textPath>
+            </text>
+          </svg>
+          <span class="relative flex h-3 w-3">
+            <span class="ping absolute inset-0 rounded-full bg-accent/70"></span>
+            <span class="relative h-3 w-3 rounded-full bg-accent"></span>
+          </span>
+        </div>
+      </div>
+    </figure>
+
+    <div class="col-span-12 lg:order-1 lg:col-span-8">
+      <p class="fade-up mb-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center lg:justify-start lg:text-left" style="--d:80ms">
+        <span class="font-medium">{site.name}</span>
+        <span aria-hidden="true" class="h-px w-6 bg-rule"></span>
+        <span class="label">{site.role}</span>
+        <span
+          class="inline-flex items-center gap-2 rounded-full border border-rule px-3 py-1 text-[0.8rem] text-ink/80"
+        >
+          <span class="relative flex h-2 w-2">
+            <span class="ping absolute inset-0 rounded-full bg-emerald-500/70"></span>
+            <span class="relative h-2 w-2 rounded-full bg-emerald-500"></span>
+          </span>
+          {site.status}
+        </span>
+      </p>
+
+      <h1
+        id="intro-heading"
+        class="text-center font-serif text-display lg:text-left"
+        aria-label={site.headline.join(' ').replaceAll('*', '')}
+      >
+        {
+          site.headline.map((line, i) => (
+            <span class="rise" aria-hidden="true">
+              <span style={`--d:${180 + i * 90}ms`}>
+                {parts(line).map((p) => (p.em ? <em class="text-accent">{p.text}</em> : p.text))}
+              </span>
+            </span>
+          ))
+        }
+      </h1>
+
+      <div class="fade-up mt-10 flex flex-wrap items-center justify-center gap-3 lg:justify-start" style="--d:650ms">
+        <a href="#work" class="btn btn-solid group">
+          See my work
+          <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-y-0.5">↓</span>
+        </a>
+        <a href="#contact" class="btn btn-ghost group">
+          Get in touch
+          <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div data-reveal class="mt-16 grid grid-cols-12 gap-x-4 gap-y-8 border-t border-rule pt-6 md:mt-20">
+    <p class="col-span-12 max-w-xl text-lg text-ink/80 md:col-span-6">{site.intro}</p>
+
+    <dl class="col-span-12 grid grid-cols-1 gap-6 text-[0.95rem] sm:grid-cols-2 md:col-span-5 md:col-start-8">
+      <div>
+        <dt class="label mb-1.5">Based in</dt>
+        <dd>
+          {site.location}
+          <span class="block text-muted">
+            <time data-localtime={site.timezone}>--:--</time> local time
+          </span>
+        </dd>
+      </div>
+      {
+        site.now && (
+          <div>
+            <dt class="label mb-1.5">Now</dt>
+            <dd class="flex gap-2">
+              <span aria-hidden="true" class="mt-[0.6em] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+              {site.now}
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+  </div>
+</section>
+
+<script>
+  // Gentle parallax on the portrait while the hero is on screen.
+  const img = document.querySelector<HTMLElement>('[data-parallax]');
+  if (img && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      // Image box overhangs the frame by 4% on top; a 3% shift never exposes a gap.
+      const y = Math.min(window.scrollY, 800) / 800;
+      img.style.translate = `0 ${y * 3}%`;
+    };
+    window.addEventListener('scroll', () => (raf ||= requestAnimationFrame(update)), { passive: true });
+  }
+</script>

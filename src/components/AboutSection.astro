@@ -1,0 +1,49 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { site } from '../data/site';
+---
+
+<section class="py-20 md:py-28" aria-labelledby="about">
+  <SectionHeading index="02" title="About" id="about" />
+
+  <div class="grid grid-cols-12 gap-x-4 gap-y-10">
+    <p data-reveal class="col-span-12 font-serif text-[clamp(1.6rem,1.1rem+1.6vw,2.4rem)] leading-snug text-ink md:col-span-10 md:col-start-2">
+      {site.about[0]}
+    </p>
+
+    <div class="col-span-12 space-y-5 text-lg text-ink/85 md:col-span-5 md:col-start-2">
+      {site.about.slice(1).map((p) => <p data-reveal>{p}</p>)}
+    </div>
+
+    <div class="col-span-12 md:col-span-5 md:col-start-8">
+      <dl data-reveal class="space-y-5 border-t border-rule pt-6">
+        {
+          site.skills.map(({ group, items }) => (
+            <div class="grid grid-cols-12 gap-x-4">
+              <dt class="label col-span-12 mb-1 sm:col-span-3 sm:mb-0 sm:pt-0.5">{group}</dt>
+              <dd class="col-span-12 sm:col-span-9">{items.join(', ')}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
+
+  <div class="mt-20 grid grid-cols-12 gap-x-4">
+    <h3 data-reveal class="label col-span-12 mb-4 md:col-span-1 md:mb-0 md:pt-6">Client work</h3>
+    <ol class="col-span-12 md:col-span-11">
+      {
+        site.experience.map((job) => (
+          <li data-reveal class="grid grid-cols-12 gap-x-4 gap-y-1 border-t border-rule py-5 last:border-b">
+            <span class="label col-span-12 md:col-span-3 md:pt-1">{job.years}</span>
+            <span class="col-span-12 font-medium md:col-span-5">
+              {job.role} <span class="text-muted">for</span>{' '}
+              <a href={job.href} class="link">{job.org}</a>
+            </span>
+            <span class="col-span-12 text-muted md:col-span-4 md:text-right">{job.note}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

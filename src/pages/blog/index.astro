@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+
+const posts = (await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<BaseLayout title="Writing" description="Notes on building software — what worked, what didn't, and what I'd try next.">
+  <section class="pb-10 pt-14 sm:pt-20">
+    <p class="label">{posts.length} posts · <a href="/rss.xml" class="link">RSS</a></p>
+    <h1 class="mt-4 font-serif text-display">
+      <span class="rise"><span>Writing</span></span>
+    </h1>
+    <p data-reveal class="mt-8 max-w-xl text-lg text-ink/80">
+      Notes on building software — what worked, what didn't, and what I'd try next.
+    </p>
+  </section>
+  <section class="pb-10">
+    <PostList posts={posts} />
+  </section>
+</BaseLayout>

@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Not found">
+  <section class="pb-24 pt-20 sm:pt-28">
+    <p class="label">Error 404</p>
+    <h1 class="mt-4 font-serif text-display">
+      <span class="rise"><span>This page wandered</span></span>
+      <span class="rise"><span style="--d:90ms"><em class="text-accent">off</em> somewhere.</span></span>
+    </h1>
+    <p class="mt-10 max-w-lg text-lg text-ink/80">
+      The link might be old, or I moved things around. Try the <a href="/" class="underline decoration-accent underline-offset-4">home page</a> or
+      <a href="/projects" class="underline decoration-accent underline-offset-4">my work</a>.
+    </p>
+  </section>
+</BaseLayout>
