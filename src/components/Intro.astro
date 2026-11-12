@@ -18,18 +18,16 @@ const ring = `${site.status} · ${site.role} · `;
           aria-hidden="true"
           class="hero-glow absolute inset-x-[8%] -bottom-6 top-[35%] rounded-full bg-accent/30 blur-3xl"
         ></div>
-        <div class="hero-arch relative aspect-[4/5] overflow-hidden rounded-b-[2rem] rounded-t-full bg-[#2a2d33] ring-1 ring-ink/10">
-          <img
-            src="/profile-cutout.webp"
-            alt={`Portrait of ${site.name}`}
-            width="819"
-            height="1024"
-            fetchpriority="high"
-            decoding="async"
-            data-parallax
-            class="hero-img absolute inset-x-0 top-[-4%] h-[108%] w-full object-cover object-[50%_0%]"
-          />
-        </div>
+        <img
+          src="/profile-cutout.webp"
+          alt={`Portrait of ${site.name}`}
+          width="819"
+          height="1024"
+          fetchpriority="high"
+          decoding="async"
+          data-parallax
+          class="hero-img relative block h-auto w-full [mask-image:linear-gradient(to_bottom,black_80%,transparent)]"
+        />
 
         <!-- Rotating badge -->
         <div
@@ -132,7 +130,6 @@ const ring = `${site.status} · ${site.role} · `;
     let raf = 0;
     const update = () => {
       raf = 0;
-      // Image box overhangs the frame by 4% on top; a 3% shift never exposes a gap.
       const y = Math.min(window.scrollY, 800) / 800;
       img.style.translate = `0 ${y * 3}%`;
     };
