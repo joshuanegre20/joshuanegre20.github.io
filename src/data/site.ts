@@ -21,7 +21,7 @@ export const site = {
   status: 'Available for work',
 
   about: [
-    "I got into programming by breaking my family's computer and then needing to fix it before anyone noticed. These days I break things on purpose, in staging.",
+    'I build software for real people close to home: a motoshop counting every peso, a construction firm pricing its next job, a church network keeping its members connected, and farmers selling livestock online.',
     'Most of my work sits where product and engineering meet: turning a rough idea into something shippable, then measuring whether it actually helped. I like small teams, short feedback loops, and writing things down.',
     "Outside work I'm usually reading, cooking something too ambitious for a weeknight, or tinkering with an open-source tool I depend on.",
   ],
@@ -39,10 +39,11 @@ export const site = {
     { group: 'Backend', items: ['Node.js', 'Express', 'Laravel', 'ASP.NET', 'Socket.IO', 'GraphQL'] },
     { group: 'Data', items: ['MySQL', 'PostgreSQL', 'SQLite', 'Redis', 'Drizzle ORM'] },
     { group: 'Desktop & hardware', items: ['Electron', 'ESP32'] },
-    { group: 'Infra & tooling', items: ['Docker', 'nginx', 'AWS', 'Firebase Cloud Messaging', 'Vitest'] },
+    { group: 'Infra & tooling', items: ['Docker', 'nginx', 'AWS', 'Firebase Cloud Messaging', 'Vitest', 'Caddy', 'Cloudflare', 'Laravel Reverb', 'Google OAuth'] },
   ],
 
   experience: [
+    { years: '2026', role: 'DevOps engineer', org: 'AgroBenta', note: 'Livestock marketplace, team project', href: '/projects/agrobenta' },
     { years: 'Nov 2026', role: 'Desktop developer', org: 'JrBanz Motoshop', note: 'Offline point of sale and inventory', href: '/projects/jrbanz-pos' },
     { years: 'Oct 2026', role: 'Desktop developer', org: 'Ardico', note: 'Construction estimating and site audits', href: '/projects/ardico' },
     { years: 'Oct — Nov 2026', role: 'Full-stack developer', org: 'Faithly', note: 'Church app, real-time API and admin site', href: '/projects/faithly' },
@@ -51,6 +52,7 @@ export const site = {
 
   socials: [
     { label: 'GitHub', href: 'https://github.com/joshuanegre20' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/joshua-negre-4a2142442/' },
     { label: 'Facebook', href: 'https://www.facebook.com/joshua.negre.9'},
     { label: 'Fiverr', href: 'https://www.fiverr.com/users/itsjoshua_desu/portfolio/' },
   ],

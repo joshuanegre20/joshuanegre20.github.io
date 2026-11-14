@@ -1,0 +1,78 @@
+<canvas
+  id="code-rain"
+  aria-hidden="true"
+  class="pointer-events-none fixed inset-0 -z-10 h-full w-full opacity-[0.14] dark:opacity-[0.2]"
+></canvas>
+
+<script>
+  const canvas = document.getElementById('code-rain') as HTMLCanvasElement | null;
+  const ctx = canvas?.getContext('2d');
+
+  if (canvas && ctx && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const glyphs = '01{}[]()<>/=;:+-*&|!?$#_.const let fn => if else return async await'.replace(/\s/g, '');
+    const size = 16;
+    const tail = 16;
+    let cols: { y: number; speed: number; chars: string[] }[] = [];
+    let w = 0;
+    let h = 0;
+    let color = '189 56 17';
+
+    const pick = () => glyphs[(Math.random() * glyphs.length) | 0];
+    const readColor = () => {
+      color = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || color;
+    };
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.font = `${size - 2}px "IBM Plex Mono", monospace`;
+      ctx.textAlign = 'center';
+      const count = Math.ceil(w / size);
+      cols = Array.from({ length: count }, (_, i) => cols[i] ?? {
+        y: Math.random() * -h / size,
+        speed: 0.25 + Math.random() * 0.45,
+        chars: Array.from({ length: tail }, pick),
+      });
+    };
+
+    let last = 0;
+    let raf = 0;
+    const frame = (t: number) => {
+      raf = requestAnimationFrame(frame);
+      if (t - last < 42) return;
+      last = t;
+      ctx.clearRect(0, 0, w, h);
+      cols.forEach((c, i) => {
+        c.y += c.speed;
+        if ((c.y - tail) * size > h) {
+          c.y = Math.random() * -20;
+          c.speed = 0.25 + Math.random() * 0.45;
+        }
+        if (Math.random() < 0.05) c.chars[(Math.random() * tail) | 0] = pick();
+        const x = i * size + size / 2;
+        for (let k = 0; k < tail; k++) {
+          const y = (Math.floor(c.y) - k) * size;
+          if (y < -size || y > h + size) continue;
+          const a = k === 0 ? 1 : (1 - k / tail) * 0.7;
+          ctx.fillStyle = `rgb(${color} / ${a})`;
+          ctx.fillText(c.chars[k], x, y);
+        }
+      });
+    };
+
+    readColor();
+    resize();
+    raf = requestAnimationFrame(frame);
+
+    window.addEventListener('resize', resize, { passive: true });
+    new MutationObserver(readColor).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    document.addEventListener('visibilitychange', () => {
+      cancelAnimationFrame(raf);
+      if (!document.hidden) raf = requestAnimationFrame(frame);
+    });
+  }
+</script>

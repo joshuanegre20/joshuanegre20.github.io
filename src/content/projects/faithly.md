@@ -3,8 +3,8 @@ title: Faithly
 description: A church community platform with a mobile app, a real-time API and an admin website, covering a social feed, chat, live streams, event registration and giving for a church network in Bohol.
 year: 2026
 role: Solo full-stack developer
-outcome: Mobile app, API and admin site in production behind Docker, nginx and a Cloudflare Tunnel, backed by 128 server tests
-tech: [TypeScript, React Native, Expo, React Router, Node.js, Express, Socket.IO, MySQL, Redis, Firebase Cloud Messaging, Docker]
+outcome: Mobile app, API and admin site in production on AWS behind Docker, nginx and a Cloudflare Tunnel, backed by 128 server tests
+tech: [TypeScript, React Native, Expo, React Router, Node.js, Express, Socket.IO, MySQL, Redis, Firebase Cloud Messaging, Docker, nginx, AWS]
 image: /projects/faithly.svg
 demo: https://cthimm-bohol.com
 featured: true
@@ -54,6 +54,7 @@ They wanted their own app: a place members actually open every day, plus one adm
 
 **Deployment**
 
+- Hosted on an **AWS** server.
 - Docker Compose runs MySQL, Redis, the API, the server-rendered web client and nginx.
 - A Cloudflare Tunnel publishes it without opening any inbound ports.
 - Fresh servers seed themselves from an init SQL folder.
